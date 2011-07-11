@@ -1,0 +1,11 @@
+# MULTISPECTRAL INTEREST POINTS FOR RGB-NIR IMAGE REGISTRATION
+# 
+# @author Damien Firmenich, EPFL
+# @date 2011
+
+# SIFT
+# Based on the paper by Lowe (2004)
+
+# Resources
+http://blogs.oregonstate.edu/hess/code/sift/
+http://www.cs.unc.edu/~ccwu/siftgpu/
