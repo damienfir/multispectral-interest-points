@@ -1,3 +1,5 @@
-CC = gcc
-CFLAGS = -g -Wall
-LDFLAGS = 
+all:
+	cd src && $(MAKE) $@
+
+clean:
+	cd src && $(MAKE) $@

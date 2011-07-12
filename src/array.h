@@ -1,3 +1,5 @@
+#ifndef ARRAY_H
+#define ARRAY_H
 
 typedef float* pixels;
 
@@ -14,9 +16,14 @@ typedef struct {
 
 typedef array image;
 
-void construct(array* a, int w, int h);
-void construct_same(array* a, array* o);
-void destruct(array* a);
+array * construct(int w, int h);
+array * construct_same(array * o);
+void destruct(array * a);
 
-void transpose(array* a);
-void multiply(array* a, array* b, array* out);
+array * transpose(array * a);
+array * multiply(array * a, array * b);
+
+array * local_extrema(array * a);
+array * convolution(array* a, array* kernel);
+
+#endif

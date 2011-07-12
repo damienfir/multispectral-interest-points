@@ -2,55 +2,82 @@
  * Multiscale Harris operator
  */ 
 
-#include <maths.h>
+#include <stdlib.h>
+#include <math.h>
 
-#include "array.h"
-#include "utilities.h"
+#include "harris.h"
 
 // utilities
-void convolution1d(float* a, float* kernel);
-void convolution(image img, array kernel);
+array * gaussian(float sig) {
+	int i,j,n,s;
+	float a,b,x;
+	float c = 1/(2*M_PI*sig*sig);
 
-void smooth(image img, float sig);
+	int max = (int)(5.0*sig) + 1; // maximum radius of kernel (mean)
+	s = max + max - 1; // total size
 
-void gradients(image img) {
-	array* kernel;
-	construct(kernel, 3, 3);
-	kernel->px = {
+	array* kernel = construct(s, s);
+
+	for (i=0; i<s; ++i) {
+		for (j=0; j<s; ++j) {
+			n = i*s + j;
+			a = (float)(i-max);
+			b = (float)(j-max);
+			
+			x = 0.0 - (a*a + b*b)/(2.0*sig*sig);
+			kernel->px[n] = c * expf(x);
+		}
+	}
+
+	return kernel;
+}
+
+void gradients(image * img, array * dx, array * dy) {
+	array* kernel = construct(3, 3);
+	dx = construct_same(img);
+	dy = construct_same(img);
+
+	float tab[] = {
 		-1.0, 0.0, 1.0,
 		-2.0, 0.0, 2.0,
 		-1.0, 0.0, 1.0
 	};
 
-	convolution(img, kernel, dx);
-	transpose(kernel);
-	convolution(img, kernel, dy);
+	kernel->px = tab;
+
+	dx = convolution(img, kernel);
+	array * kernelT = transpose(kernel);
+	dy = convolution(img, kernelT);
 
 	destruct(kernel);
+	destruct(kernelT);
 }
 
 
 // Harris operator
-void harris(pixels img, float thres) {
-	array dx, dy, dx2, dy2, dxy, strengths, corners;
+array * harris(array * img) {
+	array *dx, *dy, *dx2, *dy2, *dxy, *strengths, *corners, *kernel;
 	int i,j,n;
 
-	smooth(img);
-
+	kernel = gaussian(1.0);
+	img = convolution(img, kernel);
 	gradients(img, dx, dy);
 
-	multiply(dx, dx, dx2);
-	multiply(dy, dy, dy2);
-	multiply(dx, dy, dxy);
+	dx2 = multiply(dx, dx);
+	dy2 = multiply(dy, dy);
+	dxy = multiply(dx, dy);
 
 	destruct(dx);
 	destruct(dy);
+	
+	kernel = gaussian(2.0);
+	dx2 = convolution(dx2, kernel);
+	dy2 = convolution(dy2, kernel);
+	dxy = convolution(dxy, kernel);
 
-	smooth(dx2, 2.0);
-	smooth(dy2, 2.0);
-	smooth(dxy, 2.0);
+	destruct(kernel);
 
-	construct_same(strengths, img);
+	strengths = construct_same(img);
 	
 	// strengths
 	for(i=0; i < strengths->rows; ++i) {
@@ -65,5 +92,9 @@ void harris(pixels img, float thres) {
 	destruct(dy2);
 	destruct(dxy);
 
-	local_extrema(strengths, corners);
+	corners = local_extrema(strengths);
+	destruct(strengths);
+
+	return corners;
 }
+

@@ -1,14 +1,17 @@
+#include <stdlib.h>
+
 #include "array.h"
 
-void construct(array* a, int rows, int cols) {
-	a = malloc(sizeof(array));
+array * construct(int rows, int cols) {
+	array* a = malloc(sizeof(array));
 	a->cols = rows;
 	a->rows = cols;
-	a->px = calloc(w*h, sizeof(float));
+	a->px = calloc(rows*cols, sizeof(float));
+	return a;
 }
 
-void construct_same(array* a, array* o) {
-	construct(a, o->rows, o->cols);
+array * construct_same(array* o) {
+	return construct(o->rows, o->cols);
 }
 
 void destruct(array* a) {
@@ -16,41 +19,43 @@ void destruct(array* a) {
 	free(a);
 }
 
-void transpose(array* a) {
-	int i,j,n;
+array * transpose(array* a) {
+	int i,j,n_old,n_new;
+	array * out = construct_same(a);
+
 	for (i=0; i < a->rows; ++i) {
 		for (j=0; j < a->cols; ++j) {
 			n_old = i*a->cols + j;
 			n_new = i*a->rows + j;
 			
-			// swap
-			float tmp = a->px[n_old];
-			a->px[n_old] = a->px[n_new];
-			a->px[n_new] = tmp;
+			out->px[n_new] = a->px[n_old];
 		}
 	}
+	return out;
 }
 
 
-void multiply(array* a, array* b, array* out) {
+array * multiply(array * a, array * b) {
 	int i,j,n;
+	array * out = construct_same(a);
 
 	for (i=0; i < a->rows; ++i) {
 		for (j=0; j < a->cols; ++j) {
 			n = i*a->rows + j;
 
-			out[n] = a->px[n] * b->px[n];
+			out->px[n] = a->px[n] * b->px[n];
 		}
 	}
+	return a;
 }
 
-void local_extrema(array* a, array* out) {
+array * local_extrema(array* a) {
 	int up, down, left, right;
 	int i,j,u,v;
 	int n1, n2;
 	int localmax, localmin = 1;
 
-	construct_same(out, a);
+	array * out = construct_same(a);
 
 	for (i=0; i < a->rows; ++i) {
 		up = (i > 0) ? -1 : 0;
@@ -70,6 +75,43 @@ void local_extrema(array* a, array* out) {
 					localmin &= a->px[n1] < a->px[n2];
 				}
 			}
+		}
 		out->px[n1] = localmax || localmin;
 	}
+	return out;
 }
+
+
+array * convolution(array* a, array* kernel) {
+	int i,j,k,l,m,n,o,ii,jj;
+	float val;
+
+	array * new = construct_same(a);
+
+	int sx = (int)(kernel->rows / 2);
+	int sy = (int)(kernel->cols / 2);
+
+	for (i=0; i < a->rows; ++i) {
+		for (j=0; j < a->cols; ++j) {
+			n = i*a->rows + j; // index on array
+			val = 0.0;
+
+			for (k=0; k < kernel->rows; ++k) {
+				for (l=0; l < kernel->cols; ++l) {
+					m = k*kernel->rows + l; // index on kernel
+
+					ii = i+k-sy;
+					jj = j+l-sx;
+					o = ii*a->rows + jj; // conv index on array
+
+					if (ii >= 0 && ii < a->rows && jj > 0 && jj < a->cols)
+						val += a->px[o] * kernel->px[m];
+				}
+			}
+			new->px[n] = val;
+		}
+	}
+
+	return new;
+}
+
