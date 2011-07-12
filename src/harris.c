@@ -16,7 +16,7 @@ array * gaussian(float sig) {
 	int max = (int)(5.0*sig) + 1; // maximum radius of kernel (mean)
 	s = max + max - 1; // total size
 
-	array* kernel = construct(s, s);
+	array *kernel = construct(s, s);
 
 	for (i=0; i<s; ++i) {
 		for (j=0; j<s; ++j) {
@@ -32,8 +32,8 @@ array * gaussian(float sig) {
 	return kernel;
 }
 
-void gradients(image * img, array * dx, array * dy) {
-	array* kernel = construct(3, 3);
+void gradients(image *img, array *dx, array *dy) {
+	array *kernel = construct(3, 3);
 	dx = construct_same(img);
 	dy = construct_same(img);
 
@@ -46,13 +46,27 @@ void gradients(image * img, array * dx, array * dy) {
 	kernel->px = tab;
 
 	dx = convolution(img, kernel);
-	array * kernelT = transpose(kernel);
+	array *kernelT = transpose(kernel);
 	dy = convolution(img, kernelT);
 
 	destruct(kernel);
 	destruct(kernelT);
 }
 
+void polar(array *dx, array *dy, array *mag, array *ang) {
+	int i,j,n;
+	mag = construct_same(dx);
+	ang = construct_same(dx);
+
+	for (i=0; i < dx->rows; ++i) {
+		for (j=0; j < dx->cols; ++j) {
+			n = i*dx->rows + j;
+			
+			mag->px[n] = sqrt(pow(dx->px[n], 2) + pow(dx->py[n], 2));
+			ang->px[n] = atan2(dx->px[n], dy->px[n]);
+		}
+	}
+}
 
 // Harris operator
 array * harris(array * img) {
