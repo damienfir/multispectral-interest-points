@@ -62,7 +62,7 @@ void polar(array *dx, array *dy, array *mag, array *ang) {
 		for (j=0; j < dx->cols; ++j) {
 			n = i*dx->rows + j;
 			
-			mag->px[n] = sqrt(pow(dx->px[n], 2) + pow(dx->py[n], 2));
+			mag->px[n] = sqrt(pow(dx->px[n], 2) + pow(dx->px[n], 2));
 			ang->px[n] = atan2(dx->px[n], dy->px[n]);
 		}
 	}
@@ -73,10 +73,12 @@ array * harris(array * img) {
 	array *dx, *dy, *dx2, *dy2, *dxy, *strengths, *corners, *kernel;
 	int i,j,n;
 
+	// initial smoothing to avoid noise
 	kernel = gaussian(1.0);
 	img = convolution(img, kernel);
 	gradients(img, dx, dy);
 
+	// autocorrelation matrix
 	dx2 = multiply(dx, dx);
 	dy2 = multiply(dy, dy);
 	dxy = multiply(dx, dy);
@@ -84,6 +86,7 @@ array * harris(array * img) {
 	destruct(dx);
 	destruct(dy);
 	
+	// smoothing (average over region)
 	kernel = gaussian(2.0);
 	dx2 = convolution(dx2, kernel);
 	dy2 = convolution(dy2, kernel);
@@ -91,9 +94,8 @@ array * harris(array * img) {
 
 	destruct(kernel);
 
+	// calculate strength at each coordinate
 	strengths = construct_same(img);
-	
-	// strengths
 	for(i=0; i < strengths->rows; ++i) {
 		for (j=0; j < strengths->cols; ++j) {
 			n = i*strengths->rows + j;
@@ -106,6 +108,7 @@ array * harris(array * img) {
 	destruct(dy2);
 	destruct(dxy);
 
+	// get the extremas of the strengths
 	corners = local_extrema(strengths);
 	destruct(strengths);
 

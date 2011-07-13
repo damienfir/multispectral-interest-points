@@ -12,7 +12,7 @@ typedef struct {
 typedef struct {
 	int x;
 	int y;
-} point;
+} vec2;
 
 typedef array image;
 
