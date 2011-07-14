@@ -49,6 +49,7 @@ array * multiply(array * a, array * b) {
 	return a;
 }
 
+
 array * local_extrema(array* a) {
 	int up, down, left, right;
 	int i,j,u,v;

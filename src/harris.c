@@ -2,8 +2,8 @@
  * Multiscale Harris operator
  */ 
 
-#include <stdlib.h>
 #include <math.h>
+#include <stdlib.h>
 
 #include "harris.h"
 

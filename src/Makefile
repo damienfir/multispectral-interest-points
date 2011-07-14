@@ -3,7 +3,7 @@ CFLAGS = -c -Wall
 LDFLAGS = -lm
 
 EXECUTABLE = features
-SOURCES = harris.c array.c main.c
+SOURCES = array.c sift.c ransac.c register.c tests.c dog.c harris.c main.c
 OBJECTS = $(SOURCES:.c=.o)
 
 
