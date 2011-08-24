@@ -1,19 +1,18 @@
-CC = gcc
-CFLAGS = -c -Wall
-LDFLAGS = -lm
-
-EXECUTABLE = features
-SOURCES = array.c sift.c ransac.c register.c tests.c dog.c harris.c main.c
+LIBNAME = libfeatures.so
+SOURCES = array.c sift.c ransac.c register.c dog.c harris.c
 OBJECTS = $(SOURCES:.c=.o)
 
+CC = gcc
+CFLAGS = -c -Wall -fPIC
+LDFLAGS = -lm -shared -Wl,-soname,$LIBNAME
 
-all: $(EXECUTABLE)
+all: $(LIBNAME)
 
-$(EXECUTABLE): $(OBJECTS)
+$(LIBNAME): $(OBJECTS)
 	$(CC) $(LDFLAGS) `pkg-config --libs opencv` $(OBJECTS) -o $@
 
 .c.o:
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	rm -rf $(OBJECTS) $(EXECUTABLE)
+	rm -rf $(OBJECTS) $(LIBNAME)
