@@ -9,7 +9,8 @@ LDFLAGS = -lm -shared -Wl,-soname,$LIBNAME
 all: $(LIBNAME)
 
 $(LIBNAME): $(OBJECTS)
-	$(CC) $(LDFLAGS) `pkg-config --libs opencv` $(OBJECTS) -o $@
+	$(CC) $(LDFLAGS) `pkg-config --libs opencv` $(OBJECTS) -o $(LIBNAME)
+	mv $(LIBNAME) ..
 
 .c.o:
 	$(CC) $(CFLAGS) $< -o $@

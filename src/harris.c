@@ -4,6 +4,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "harris.h"
 
@@ -72,6 +73,7 @@ void polar(array *dx, array *dy, array *mag, array *ang) {
 array * harris(array * img) {
 	array *dx, *dy, *dx2, *dy2, *dxy, *strengths, *corners, *kernel;
 	int i,j,n;
+	return img;
 
 	// initial smoothing to avoid noise
 	kernel = gaussian(1.0);
