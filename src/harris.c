@@ -9,10 +9,10 @@
 #include "harris.h"
 
 // utilities
-array * gaussian(float sig) {
+array * gaussian(double sig) {
 	int i,j,n,s;
-	float a,b,x;
-	float c = 1/(2*M_PI*sig*sig);
+	double a,b,x;
+	double c = 1/(2*M_PI*sig*sig);
 
 	int max = (int)(5.0*sig) + 1; // maximum radius of kernel (mean)
 	s = max + max - 1; // total size
@@ -22,8 +22,8 @@ array * gaussian(float sig) {
 	for (i=0; i<s; ++i) {
 		for (j=0; j<s; ++j) {
 			n = i*s + j;
-			a = (float)(i-max);
-			b = (float)(j-max);
+			a = (double)(i-max);
+			b = (double)(j-max);
 			
 			x = 0.0 - (a*a + b*b)/(2.0*sig*sig);
 			kernel->px[n] = c * expf(x);
@@ -38,7 +38,7 @@ void gradients(image *img, array *dx, array *dy) {
 	dx = construct_same(img);
 	dy = construct_same(img);
 
-	float tab[] = {
+	double tab[] = {
 		-1.0, 0.0, 1.0,
 		-2.0, 0.0, 2.0,
 		-1.0, 0.0, 1.0
@@ -69,11 +69,16 @@ void polar(array *dx, array *dy, array *mag, array *ang) {
 	}
 }
 
+
 // Harris operator
-array * harris(array * img) {
-	array *dx, *dy, *dx2, *dy2, *dxy, *strengths, *corners, *kernel;
-	int i,j,n;
-	return img;
+void harris(array * img, pixels result, int *a) {
+	array *dx, *dy, *dx2, *dy2, *dxy, *strengths, *kernel;
+	int i,j,n,b;
+	img->px[0] = 1.0;
+	result = img->px;
+	b = 4;
+	a = &b;
+	return;
 
 	// initial smoothing to avoid noise
 	kernel = gaussian(1.0);
@@ -111,9 +116,8 @@ array * harris(array * img) {
 	destruct(dxy);
 
 	// get the extremas of the strengths
-	corners = local_extrema(strengths);
+	result = local_extrema(strengths)->px;
 	destruct(strengths);
 
-	return corners;
+	return;
 }
-

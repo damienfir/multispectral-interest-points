@@ -1,7 +1,7 @@
 #ifndef ARRAY_H
 #define ARRAY_H
 
-typedef float* pixels;
+typedef double* pixels;
 
 typedef struct {
 	int rows;
@@ -10,8 +10,8 @@ typedef struct {
 } array;
 
 typedef struct {
-	float x;
-	float y;
+	double x;
+	double y;
 } vec2;
 
 typedef array image;
