@@ -4,6 +4,6 @@
 #include "array.h"
 
 void gradients(image* img, array * dx, array * dy);
-void harris(array * img, pixels result, int *a);
+void harris(array * img, pixels result);
 
 #endif

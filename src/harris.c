@@ -71,13 +71,11 @@ void polar(array *dx, array *dy, array *mag, array *ang) {
 
 
 // Harris operator
-void harris(array * img, pixels result, int *a) {
+void harris(array * img, pixels result) {
 	array *dx, *dy, *dx2, *dy2, *dxy, *strengths, *kernel;
-	int i,j,n,b;
+	int i,j,n;
 	img->px[0] = 1.0;
 	result = img->px;
-	b = 4;
-	a = &b;
 	return;
 
 	// initial smoothing to avoid noise
