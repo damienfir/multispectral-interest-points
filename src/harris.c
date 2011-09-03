@@ -9,10 +9,10 @@
 #include "harris.h"
 
 // utilities
-array * gaussian(double sig) {
+array * gaussian(pixel sig) {
 	int i,j,n,s;
-	double a,b,x;
-	double c = 1/(2*M_PI*sig*sig);
+	pixel a,b,x;
+	pixel c = 1/(2*M_PI*sig*sig);
 
 	int max = (int)(5.0*sig) + 1; // maximum radius of kernel (mean)
 	s = max + max - 1; // total size
@@ -22,11 +22,11 @@ array * gaussian(double sig) {
 	for (i=0; i<s; ++i) {
 		for (j=0; j<s; ++j) {
 			n = i*s + j;
-			a = (double)(i-max);
-			b = (double)(j-max);
+			a = (pixel)(i-max);
+			b = (pixel)(j-max);
 			
 			x = 0.0 - (a*a + b*b)/(2.0*sig*sig);
-			kernel->px[n] = c * expf(x);
+			kernel->px[n] = c * exp(x);
 		}
 	}
 
@@ -72,11 +72,8 @@ void polar(array *dx, array *dy, array *mag, array *ang) {
 
 // Harris operator
 void harris(array * img, pixels result) {
-	array *dx, *dy, *dx2, *dy2, *dxy, *strengths, *kernel;
+	array *dx, *dy, *dx2, *dy2, *dxy, *strengths, *kernel, *extr;
 	int i,j,n;
-	img->px[0] = 1.0;
-	result = img->px;
-	return;
 
 	// initial smoothing to avoid noise
 	kernel = gaussian(1.0);
@@ -114,7 +111,8 @@ void harris(array * img, pixels result) {
 	destruct(dxy);
 
 	// get the extremas of the strengths
-	result = local_extrema(strengths)->px;
+	extr = local_extrema(strengths);
+	copy_px(extr, result);
 	destruct(strengths);
 
 	return;

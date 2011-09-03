@@ -1,7 +1,8 @@
 #ifndef ARRAY_H
 #define ARRAY_H
 
-typedef double* pixels;
+typedef double pixel;
+typedef pixel* pixels;
 
 typedef struct {
 	int rows;
@@ -19,6 +20,9 @@ typedef array image;
 array * construct(int w, int h);
 array * construct_same(array * o);
 void destruct(array * a);
+
+void copy(pixels from, pixels to, int n);
+void copy_px(array * from, pixels to);
 
 array * transpose(array * a);
 array * multiply(array * a, array * b);

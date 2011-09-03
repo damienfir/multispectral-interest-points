@@ -6,7 +6,7 @@ array * construct(int rows, int cols) {
 	array* a = malloc(sizeof(array));
 	a->cols = rows;
 	a->rows = cols;
-	a->px = calloc(rows*cols, sizeof(float));
+	a->px = calloc(rows*cols, sizeof(pixel));
 	return a;
 }
 
@@ -17,6 +17,17 @@ array * construct_same(array* o) {
 void destruct(array* a) {
 	free(a->px);
 	free(a);
+}
+
+void copy(pixels from, pixels to, int n) {
+	int i;
+	for (i = 0; i < n; i++) {
+		to[i] = from[i];
+	}
+}
+
+void copy_px(array * from, pixels to) {
+	copy(from->px, to, from->rows*from->cols);
 }
 
 array * transpose(array* a) {
@@ -85,7 +96,7 @@ array * local_extrema(array* a) {
 
 array * convolution(array* a, array* kernel) {
 	int i,j,k,l,m,n,o,ii,jj;
-	float val;
+	pixel val;
 
 	array * new = construct_same(a);
 
