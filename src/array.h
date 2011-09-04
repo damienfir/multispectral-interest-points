@@ -7,6 +7,7 @@ typedef pixel* pixels;
 typedef struct {
 	int rows;
 	int cols;
+	int n;
 	pixels px;
 } array;
 
@@ -20,6 +21,8 @@ typedef array image;
 array * construct(int w, int h);
 array * construct_same(array * o);
 void destruct(array * a);
+
+void info(array *a);
 
 void copy(pixels from, pixels to, int n);
 void copy_px(array * from, pixels to);

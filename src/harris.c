@@ -34,9 +34,8 @@ array * gaussian(pixel sig) {
 }
 
 void gradients(image *img, array *dx, array *dy) {
-	array *kernel = construct(3, 3);
-	dx = construct_same(img);
-	dy = construct_same(img);
+	array *kernel, *kernelT;
+	kernel = construct(3, 3);
 
 	double tab[] = {
 		-1.0, 0.0, 1.0,
@@ -47,33 +46,30 @@ void gradients(image *img, array *dx, array *dy) {
 	kernel->px = tab;
 
 	dx = convolution(img, kernel);
-	array *kernelT = transpose(kernel);
+	kernelT = transpose(kernel);
 	dy = convolution(img, kernelT);
+	info(dy);
 
-	destruct(kernel);
-	destruct(kernelT);
+//	destruct(kernel);
+//	destruct(kernelT);
 }
 
 void polar(array *dx, array *dy, array *mag, array *ang) {
-	int i,j,n;
+	int i;
 	mag = construct_same(dx);
 	ang = construct_same(dx);
 
-	for (i=0; i < dx->rows; ++i) {
-		for (j=0; j < dx->cols; ++j) {
-			n = i*dx->rows + j;
-			
-			mag->px[n] = sqrt(pow(dx->px[n], 2) + pow(dx->px[n], 2));
-			ang->px[n] = atan2(dx->px[n], dy->px[n]);
-		}
+	for (i=0; i < dx->n; ++i) {
+		mag->px[i] = sqrt(pow(dx->px[i], 2) + pow(dx->px[i], 2));
+		ang->px[i] = atan2(dx->px[i], dy->px[i]);
 	}
 }
 
 
 // Harris operator
 void harris(array * img, pixels result) {
-	array *dx, *dy, *dx2, *dy2, *dxy, *strengths, *kernel, *extr;
-	int i,j,n;
+	array *dx, *dy, *dx2, *dy2, *dxy, *strengths, *kernel, *extr, *tmp;
+	int i;
 
 	// initial smoothing to avoid noise
 	kernel = gaussian(1.0);
@@ -81,9 +77,12 @@ void harris(array * img, pixels result) {
 	gradients(img, dx, dy);
 
 	// autocorrelation matrix
+	info(dx);
+	info(dy);
 	dx2 = multiply(dx, dx);
 	dy2 = multiply(dy, dy);
 	dxy = multiply(dx, dy);
+	return;
 
 	destruct(dx);
 	destruct(dy);
@@ -98,12 +97,8 @@ void harris(array * img, pixels result) {
 
 	// calculate strength at each coordinate
 	strengths = construct_same(img);
-	for(i=0; i < strengths->rows; ++i) {
-		for (j=0; j < strengths->cols; ++j) {
-			n = i*strengths->rows + j;
-			
-			strengths->px[n] = 2 * (dx2->px[n] * dy2->px[n] - dxy->px[n]*dxy->px[n]) / (dx2->px[n] + dy2->px[n]);
-		}
+	for(i=0; i < strengths->n; ++i) {
+		strengths->px[i] = 2 * (dx2->px[i] * dy2->px[i] - dxy->px[i]*dxy->px[i]) / (dx2->px[i] + dy2->px[i]);
 	}
 
 	destruct(dx2);
