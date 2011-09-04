@@ -10,6 +10,7 @@ typedef struct {
 	int n;
 	pixels px;
 } array;
+typedef array* array_p;
 
 typedef struct {
 	double x;

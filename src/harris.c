@@ -33,7 +33,7 @@ array * gaussian(pixel sig) {
 	return kernel;
 }
 
-void gradients(image *img, array *dx, array *dy) {
+void gradients(image *img, array_p *dx, array_p *dy) {
 	array *kernel, *kernelT;
 	kernel = construct(3, 3);
 
@@ -45,10 +45,9 @@ void gradients(image *img, array *dx, array *dy) {
 
 	kernel->px = tab;
 
-	dx = convolution(img, kernel);
+	*dx = convolution(img, kernel);
 	kernelT = transpose(kernel);
-	dy = convolution(img, kernelT);
-	info(dy);
+	*dy = convolution(img, kernelT);
 
 //	destruct(kernel);
 //	destruct(kernelT);
@@ -67,25 +66,22 @@ void polar(array *dx, array *dy, array *mag, array *ang) {
 
 
 // Harris operator
-void harris(array * img, pixels result) {
-	array *dx, *dy, *dx2, *dy2, *dxy, *strengths, *kernel, *extr, *tmp;
+void harris(image *img, pixels result) {
+	array *dx, *dy, *dx2, *dy2, *dxy, *strengths, *kernel, *extr;
 	int i;
 
 	// initial smoothing to avoid noise
 	kernel = gaussian(1.0);
 	img = convolution(img, kernel);
-	gradients(img, dx, dy);
+	gradients(img, &dx, &dy);
 
 	// autocorrelation matrix
-	info(dx);
-	info(dy);
 	dx2 = multiply(dx, dx);
 	dy2 = multiply(dy, dy);
 	dxy = multiply(dx, dy);
-	return;
 
-	destruct(dx);
-	destruct(dy);
+	//destruct(dx);
+	//destruct(dy);
 	
 	// smoothing (average over region)
 	kernel = gaussian(2.0);
@@ -93,7 +89,7 @@ void harris(array * img, pixels result) {
 	dy2 = convolution(dy2, kernel);
 	dxy = convolution(dxy, kernel);
 
-	destruct(kernel);
+	//destruct(kernel);
 
 	// calculate strength at each coordinate
 	strengths = construct_same(img);
@@ -101,14 +97,15 @@ void harris(array * img, pixels result) {
 		strengths->px[i] = 2 * (dx2->px[i] * dy2->px[i] - dxy->px[i]*dxy->px[i]) / (dx2->px[i] + dy2->px[i]);
 	}
 
-	destruct(dx2);
-	destruct(dy2);
-	destruct(dxy);
+	//destruct(dx2);
+	//destruct(dy2);
+	//destruct(dxy);
 
 	// get the extremas of the strengths
 	extr = local_extrema(strengths);
 	copy_px(extr, result);
-	destruct(strengths);
+	info(extr);
+	//destruct(strengths);
 
 	return;
 }
