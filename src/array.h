@@ -23,7 +23,7 @@ array * construct(int w, int h);
 array * construct_same(array * o);
 void destruct(array * a);
 
-void info(array *a);
+void info(array *a, int);
 
 void copy(pixels from, pixels to, int n);
 void copy_px(array * from, pixels to);

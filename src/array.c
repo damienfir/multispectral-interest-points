@@ -1,16 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
 #include "array.h"
 
 array * construct(int rows, int cols) {
-	int i;
 	array* a = malloc(sizeof(array));
 	a->rows = rows;
 	a->cols = cols;
 	a->n = rows*cols;
 	a->px = calloc(a->n, sizeof(pixel));
-	//for (i = 0; i < a->n; i++) a->px[i] = 0.0;
 	return a;
 }
 
@@ -23,9 +22,8 @@ void destruct(array* a) {
 	free(a);
 }
 
-void info(array *a) {
+void info(array *a, int n) {
 	int i, j, ind = 0;
-	int n = 5;
 
 	printf("[array] r:%d c:%d -- %d\n", a->rows, a->cols, a->n);
 	for (i = 0; i < a->rows; i++) {
@@ -69,7 +67,7 @@ array * transpose(array* a) {
 
 
 array * multiply(array * a, array * b) {
-	int i,j,n;
+	int i;
 	array * out = construct_same(a);
 
 	for (i=0; i < a->n; ++i) {
@@ -113,7 +111,7 @@ array * local_extrema(array* a) {
 
 
 array * convolution(array *a, array *kernel) {
-	unsigned int i,j,k,l,m,n,o,ii,jj;
+	unsigned int i, j, k, l, index_im, index_ker, o, ii, jj;
 	pixel val;
 
 	array *new = construct_same(a);
@@ -121,11 +119,12 @@ array * convolution(array *a, array *kernel) {
 	int sx = (int)(kernel->rows / 2);
 	int sy = (int)(kernel->cols / 2);
 
-	n = 0;
+	index_im = 0;
 	for (i=0; i < a->rows; ++i) {
 		for (j=0; j < a->cols; ++j) {
+
 			val = 0.0;
-			m = 0;
+			index_ker = 0;
 			for (k=0; k < kernel->rows; ++k) {
 				for (l=0; l < kernel->cols; ++l) {
 					ii = i+k-sy;
@@ -133,13 +132,12 @@ array * convolution(array *a, array *kernel) {
 					o = ii*a->rows + jj; // conv index on array
 
 					if (ii >= 0 && ii < a->rows && jj > 0 && jj < a->cols) {
-						val += a->px[o] * kernel->px[m];
+						val += a->px[o] * kernel->px[index_ker];
 					}
-					m++;
+					index_ker++;
 				}
 			}
-			new->px[n] = val;
-			n++;
+			new->px[index_im++] = val;
 		}
 	}
 

@@ -6,7 +6,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "opencv2/imgproc/imgproc.hpp"
+
 #include "harris.h"
+
+using namespace cv;
 
 // utilities
 array * gaussian(pixel sig) {
@@ -72,7 +76,10 @@ void harris(image *img, pixels result) {
 
 	// initial smoothing to avoid noise
 	kernel = gaussian(1.0);
+	info(kernel, 10);
 	img = convolution(img, kernel);
+	copy_px(img, result);
+	return;
 	gradients(img, &dx, &dy);
 
 	// autocorrelation matrix
@@ -104,7 +111,7 @@ void harris(image *img, pixels result) {
 	// get the extremas of the strengths
 	extr = local_extrema(strengths);
 	copy_px(extr, result);
-	info(extr);
+	info(extr, 10);
 	//destruct(strengths);
 
 	return;
